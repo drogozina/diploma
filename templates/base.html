@@ -1,0 +1,27 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Составить рабочую программу дисциплины</title>
+    <style>
+        textarea { width: 90%; }
+   .center {
+    padding: 10px; /* Поля вокруг текста */
+    margin: auto; /* Выравниваем по центру */
+   }
+table {
+    padding: 10px;
+}
+  </style>
+</head>
+<body>
+<link rel="stylesheet" type="text/css" href="{% static 'test3/boot.css' %}"/>
+<script src={% static "test3/jquery-3.2.0.min.js" %} xmlns="http://www.w3.org/1999/html"></script>
+
+{% block content %}
+{% endblock %}
+</body>
+</html>

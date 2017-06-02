@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<script src={% static "test3/jquery-3.2.0.min.js" %} xmlns="http://www.w3.org/1999/html"></script>
+
+<script type="text/javascript">
+    function addOption (oListbox, text, value, isDefaultSelected, isSelected)
+{
+  var oOption = document.createElement("option");
+  oOption.appendChild(document.createTextNode(text));
+  oOption.setAttribute("value", value);
+
+  if (isDefaultSelected) oOption.defaultSelected = true;
+  else if (isSelected) oOption.selected = true;
+
+  oListbox.appendChild(oOption);
+}
+
+ function change_form(forma) {
+     console.log("change_form");
+     $.post("{% url 'info' %}",
+            {
+                'forma' : forma.toString()
+            },
+             function (data) {
+                 var arr = data.split("\n");
+                 var objSel = document.getElementById("direction");
+                 objSel.options.length = 0;
+                 arr.forEach(function(item, i, arra) {
+                     addOption(objSel, item, item);
+                    }
+                 );
+                 objSel.options[objSel.options.length-1] = null;
+             }
+     )
+ }
+
+function change_directory(dir){
+    console.log("change_directory");
+     $.post("{% url 'info' %}",
+            {
+                'dir' : dir.toString()
+            },
+             function (data) {
+                 var arr = data.split("\n");
+                 var objSel = document.getElementById("Курс");
+                 objSel.options.length = 0;
+                 arr.forEach(function(item, i, arra) {
+                     addOption(objSel, item, item);
+                    }
+                 );
+                 objSel.options[objSel.options.length-1] = null;
+                 console.log("post is done")
+
+             }
+     )
+}
+
+function change_course(course){
+    console.log("change_directory");
+     $.post("{% url 'info' %}",
+            {
+                'course' : course.toString()
+            },
+             function (data) {
+                 var arr = data.split("\n");
+                 var objSel = document.getElementById("кафедра");
+                 objSel.options.length = 0;
+                 arr.forEach(function(item, i, arra) {
+                     addOption(objSel, item, item);
+                    }
+                 );
+                 objSel.options[objSel.options.length-1] = null;
+                 console.log("course is changed")
+
+             }
+     )
+}
+
+function change_dep(dep) {
+     console.log("change_department");
+     $.post("{% url 'info' %}",
+            {
+                'department' : dep.toString()
+            },
+             function (data) {
+                 var arr = data.split("\n");
+                 var objSel = document.getElementById("И. О. Фамилия:");
+                 objSel.options.length = 0;
+                 arr.forEach(function(item, i, arra) {
+                     addOption(objSel, item, item);
+                    }
+                 );
+                 objSel.options[objSel.options.length-1] = null;
+             }
+     )
+ }
+
+function change_author(author) {
+     console.log("change_department");
+     $.post("{% url 'info' %}",
+            {
+                'author' : author.toString()
+            },
+             function (data) {
+                 var arr = data.split("\n");
+                 var objSel = document.getElementById("Дисциплина");
+                 objSel.options.length = 0;
+                 arr.forEach(function(item, i, arra) {
+                     addOption(objSel, item, item);
+                    }
+                 );
+                 objSel.options[objSel.options.length-1] = null;
+                 console.log("author is changed");
+             }
+     )
+ }
+
+function send_protocol(protocol) {
+     console.log("change_department");
+     $.post("{% url 'info' %}",
+            {
+                'protocol' : protocol.toString()
+            },
+             function () {
+                 console.log("protocol is sent")
+             }
+     )
+ }
+
+function send_date(date) {
+     console.log("change_department");
+     $.post("{% url 'info' %}",
+            {
+                'date' : date.toString()
+            },
+             function () {
+
+                 console.log("date is sent")
+             }
+     )
+ }
+
+function change_disp(disp){
+    console.log("change_discipline");
+     $.post("{% url 'info' %}",
+            {
+                'discipline' : disp.toString()
+            },
+             function (data) {
+                 console.log("discipline is changed");
+                 var i = 0;
+                 var arr = data.split("\n");
+
+                 arr.forEach(function(item, i, arra) {
+                     var child = document.createElement("td");
+                     child.innerHTML = arr[i++];
+
+                     document.getElementById(i).replaceChild(child, document.getElementById(i).lastChild);
+                    }
+                 );
+             }
+     )
+}
+
+function toggle() {
+  var element=document.getElementById('name');
+  var todisappear=document.getElementById("И. О. Фамилия:");
+  if(element.style.display==='none'){
+      element.style.display='';
+      element.required = 1;
+      todisappear.required = 0;
+      todisappear.style.display='none';
+  }
+  else {
+      element.style.display='none';
+      todisappear.style.display='';
+      todisappear.required = 1;
+      element.required = 0;
+  }
+}
+
+</script>
+<form id="form" method="POST" enctype="multipart/form-data" action="{% url 'create'  pk%}">
+{% csrf_token %}
+<p style="text-align: center;"><span style="font-size:24px"><strong>Составить рабочую программу дисциплины</strong></span></p>
+<div class=center align="center">
+
+<p><strong>
+       <input type="radio" name="study_form"  value="Очная"  onclick="change_form(value)"/> Очная<br />
+        <input type="radio" name="study_form" value="Заочная"  onclick="change_form(value)"/> Заочная<br />
+
+        <label for="direction">Направление подготовки:</label>
+        <select name="direction" id="direction" required="required" onclick="change_directory(value)"></select>
+</strong></p>
+    <p><strong>
+
+    <label for="Курс">Курс:</label>
+    <select name="Курс" id="Курс" required="required" onclick="change_course(value)">
+    </select>
+
+</strong></p>
+    <p>Программу дисциплины разработал:</p>
+
+<label for="кафедра" style="margin-left: 40px;">кафедра:&nbsp;<select id="кафедра" required="required" name="кафедра" onclick="change_dep(value)"></select></label>
+
+<label for="И. О. Фамилия:" style="margin-left: 40px;">И. О. Фамилия:&nbsp;
+    <select name="И. О. Фамилия:" id="И. О. Фамилия:" onclick="change_author(value)"></select>
+
+
+</label>
+<br/>
+    <input type="checkbox" name="userenters" id="userenters"  onchange="toggle()">Ввести имя вручную
+    <input type="text" id="name"  placeholder="ФИО - ученая степень, должность" style="display: none" onchange="change_author(value)"/>
+<p style="margin-left: 40px;">&nbsp;</p>
+
+<label for="Протокол №">Протокол №&nbsp;
+    <input name="Протокол №" id="Протокол №" required="required" size="3" type="text" onchange="send_protocol(value)" />&nbsp;от <input type="date" required="required" onchange="send_date(value)"/>
+</label>
+<p><strong>
+
+    <label for="Дисциплина">Дисциплина:</label>
+    <select name="Дисциплина" id="Дисциплина" required onclick="change_disp(value)"> </select>
+
+</strong></p>
+    <i>Если нужной дисциплины нет в списке, свяжитесь с администратором.</i><br/>
+<table align="center" border="1" cellpadding="1" cellspacing="1" id="results">
+	<tbody>
+		<tr id="1">
+			<td>
+			<p>Направление подготовки</p>
+			</td>
+		</tr>
+		<tr id="2">
+			<td>Код направления подготовки</td>
+		</tr>
+		<tr id="3">
+			<td>Профиль подготовки</td>
+		</tr>
+		<tr id="4">
+			<td>Базовая/вариативная часть</td>
+		</tr>
+		<tr id="5">
+			<td>Обязательная дисциплина/дисциплина по выбору факультета</td>
+		</tr>
+	</tbody>
+</table>
+
+
+
+{#<p><input  name="Начать" type="submit"  value="Начать" /></p>#}
+    <input type="submit" value="Начать">
+</div></form>
+
+{% endblock %}

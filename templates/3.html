@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+    <script src={% static "test3/jquery-3.2.0.min.js" %} xmlns="http://www.w3.org/1999/html"></script>
+
+<script type="text/javascript">
+function download() {
+    $.post("{% url 'finish' pk%}");
+}
+</script>
+    <div align="center">
+
+    Готово!
+        Скачать программу дисциплины в формате .docx - <a href="{% url 'download' pk %}">скачать</a>
+      </div>
+ {% endblock %}

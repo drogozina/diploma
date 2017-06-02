@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+<script src={% static "test3/jquery-3.2.0.min.js" %} xmlns="http://www.w3.org/1999/html"></script>
+
+<script type="text/javascript">
+
+function sendContent(cont) {
+    $.post("{% url 'create' pk %}",
+            {
+                'content' : cont.toString()
+{#                'methodTable' : methodTable.toString()#}
+{#                'tableBase' : tableBase.toString()#}
+{#                'arrayOfHours' : array.toString()#}
+            },
+             function () {
+             console.log("content is sent");
+{#             document.getElementById("form").submit();#}
+             });
+}
+
+function sendMethodTable(methodTable) {
+    $.post("{% url 'create' pk %}",
+            {
+{#                'content' : cont.toString()#}
+                'methodTable' : methodTable.toString()
+{#                'tableBase' : tableBase.toString()#}
+{#                'arrayOfHours' : array.toString()#}
+            },
+             function () {
+             console.log("methodTable is sent");
+{#             document.getElementById("form").submit();#}
+             });
+}
+
+function sendTableBase(tableBase) {
+    $.post("{% url 'create' pk %}",
+            {
+{#                'content' : cont.toString()#}
+{#                'methodTable' : methodTable.toString()#}
+                'tableBase' : tableBase.toString()
+{#                'arrayOfHours' : array.toString()#}
+            },
+             function () {
+             console.log("tableBase is sent");
+{#             document.getElementById("form").submit();#}
+             });
+}
+
+function sendArrayOfHours(array) {
+    $.post("{% url 'create' pk %}",
+            {
+{#                'content' : cont.toString()#}
+{#                'methodTable' : methodTable.toString()#}
+{#                'tableBase' : tableBase.toString()#}
+                'arrayOfHours' : array.toString()
+            },
+             function () {
+             console.log("array is sent");
+{#             document.getElementById("form").submit();#}
+             });
+}
+
+function sendEverything() {
+
+    var cont = document.getElementById('cont').value + '$' + document.getElementById('listof').value;
+    var methodTable = [];
+    for(var i =100; i<=document.getElementById('tbodymethodTable').lastElementChild.id;++i) {
+        var str = '';
+        str += document.getElementById('theme' + Number(i)).value + '$';
+        str += document.getElementById('task' + Number(i)).value + '$';
+        str += document.getElementById('literature' + Number(i)).value + '$';
+        str += document.getElementById('cntrlform' + Number(i)).value;
+        methodTable.push(str);
+    }
+    var tableBase = [];
+    if ( document.getElementById('locationsname200').value) {
+        for(i =200; i<=document.getElementById('tbodyBase').lastElementChild.id;++i) {
+        str = '';
+        str += document.getElementById('locationsname' + Number(i)).value + '$';
+        str += document.getElementById('equipment' + Number(i)).value + '$';
+        str += document.getElementById('license' + Number(i)).value;
+        tableBase.push(str);
+    }
+    }
+    else {
+        tableBase.push('нет$нет$нет');
+    }
+    var table = document.getElementById("tbodyofhours");
+    var trs = table.getElementsByTagName("tr");
+    var array = [];
+    var names = ["partofdiscipline", "semester", "allinpart", "all", "lectures", "pracs", "labs", "self"];
+    for (i = 0; i < trs.length; ++i) {
+        if (trs[i].id) {
+            var temp = trs[i];
+            str = "";
+            for (var j = 0; j < names.length; ++j) {
+                str += document.getElementById(names[j]+temp.id).value + "$";
+
+            }
+            array.push(str);
+        }
+    }
+    str = "ИТОГО$ $";
+    for (j = 2; j < names.length; ++j) {
+        str += document.getElementById(names[j]).innerHTML + "$";
+
+    }
+    array.push(str);
+    $.post("{% url 'create' pk %}",
+            {
+                'content' : cont.toString(),
+                'methodTable' : methodTable.toString(),
+                'tableBase' : tableBase.toString(),
+                'arrayOfHours' : array.toString()
+            },
+             function (data) {
+             document.getElementById("form").submit();
+             });
+}
+
+
+
+function getTheme() {
+    for(var i =100, j=1; j<=document.getElementById('tbodyofhours').lastElementChild.id;++i,++j) {
+        if (document.getElementById('theme' + Number(i)) === null) {
+            addTr('100', 'tbodymethodTable', ['theme','task', 'literature', 'cntrlform']);
+        }
+        document.getElementById('theme' + Number(i)).value = document.getElementById('partofdiscipline'+j).value;
+    }
+
+}
+
+function getPartOfDisc() {
+    var id = ['id_lectures', 'id_pracs', 'id_labs'];
+    var name = 'partofdiscipline';
+    var hours = ['lectures', 'pracs', 'labs'];
+    for(var j=0;j<3;++j){
+        var element = document.getElementById(id[j]);
+        var str = '';
+        for(var i=1;i<=document.getElementById("tbodyofhours").lastElementChild.id; ++i){
+            var temp = document.getElementById(name+i).value+" (" + document.getElementById(hours[j]+i).value+" ч.)\n";
+
+                str = str + temp + '\n';
+        }
+        element.value = str;
+
+    }
+    getTheme();
+}
+
+function addTr(id, addid, names) {
+    var toclone = document.getElementById(id);
+    var toadd = document.getElementById(addid);
+    var newnode = toclone.cloneNode(true);
+{#    var last = #}
+    newnode.id = Number(toadd.lastElementChild.id) + 1;
+    toadd.appendChild(newnode);
+    var nodes = newnode.cells;
+    for (var i = 0; i < nodes.length; ++i) {
+        var temp = nodes[i];
+        temp.innerHTML ='<input required type="text" title="'+names[i]+'" id="' + names[i]+newnode.id+'" style="width: 100%">';
+    }
+}
+
+
+
+
+
+function inTotal() {
+
+    var sum = document.getElementById("all");
+    var lecs = document.getElementById("lectures");
+    var pracs = document.getElementById("pracs");
+    var labs = document.getElementById("labs");
+    var allinpart = document.getElementById("allinpart");
+    var self = document.getElementById("self");
+    sum.innerHTML =  0;
+    lecs.innerHTML = 0;
+    pracs.innerHTML = 0;
+    labs.innerHTML = 0;
+    self.innerHTML = 0;
+    allinpart.innerHTML = 0;
+    var temp = "";
+    for(i=1;i<=document.getElementById("tbodyofhours").lastElementChild.id; ++i){
+        sum.innerHTML =  Number(document.getElementById("all"+i).value) + Number(sum.innerHTML);
+    lecs.innerHTML = Number(document.getElementById("lectures"+i).value) + Number(lecs.innerHTML);
+    pracs.innerHTML = Number(document.getElementById("pracs"+i).value) + Number(pracs.innerHTML);
+    labs.innerHTML = Number(document.getElementById("labs"+i).value) + Number(labs.innerHTML);
+    self.innerHTML = Number(document.getElementById("self"+i).value) + Number(self.innerHTML);
+    allinpart.innerHTML = Number(document.getElementById("allinpart"+i).value) + Number(allinpart.innerHTML);
+    }
+    var hours = document.getElementById("hoursfromtable");
+    hours.value = Number(allinpart.innerHTML);
+
+
+    console.log(document.getElementById("tbodyofhours").lastElementChild.id);
+}
+
+function calculate(id) {
+    var name = document.getElementById("partofdiscipline"+id);
+    var sem = document.getElementById("semester"+id);
+    var sum = document.getElementById("all"+id);
+    var lecs = document.getElementById("lectures"+id);
+    var pracs = document.getElementById("pracs"+id);
+    var labs = document.getElementById("labs"+id);
+    var allinpart = document.getElementById("allinpart"+id);
+    var self = document.getElementById("self"+id);
+    sum.value =  Number(lecs.value) +  Number(pracs.value) +  Number(labs.value);
+    allinpart.value = Number(sum.value) + Number(self.value);
+    inTotal();
+}
+</script>
+<style>
+input#id_intensity {
+    width:10%;
+}
+</style>
+<form id="form" method="POST"  enctype="multipart/form-data">
+{% csrf_token %}
+        <p style="text-align: center;"><span style="font-size:24px"><strong>Составить рабочую программу дисциплины</strong></span></p>
+    <div align="left">
+    <table align="center" width="100%" id="page2table">
+            <tbody>
+        {% for obj in form %}
+
+            <tr>
+                <td align="right" width="30%" valign="top">
+                    {{ obj.label_tag }}
+                </td>
+                    {% if obj.html_name == 'goal' %}
+                        <td align="center">
+                        {{ obj }}
+                        <table border="1" width="90%" style="table-layout: fixed;">
+                        <caption style="text-align: center;color: black">Перечень планируемых результатов обучения по дисциплине, соотнесенных с планируемыми результатами освоения образовательной программы</caption>
+                        <tbody >
+                        <tr style="width: inherit">
+                            <th >
+                            Коды компетенций (по ФГОС ВО)
+                        </th>
+                            <th >
+                                Содержание компетенций согласно ФГОС ВО
+                            </th>
+                            <th >
+                                Перечень планируемых результатов обучения по дисциплине
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                {% if "ПСК" in program.discipline.competention %}
+                                    ПСК
+                                    {% else %}
+                                    ОК
+                                    {% endif %}
+                            </th>
+                            <th colspan="2">
+                                {% if "ПСК" in program.discipline.competention %}
+                                    ПРОФИЛЬНО-СПЕЦИАЛИЗИРОВАННЫЕ КОМПЕТЕНЦИИ ВЫПУСКНИКА
+                                    {% else %}
+                                    ОБЩЕКУЛЬТУРНЫЕ КОМПЕТЕНЦИИ ВЫПУСКНИКА
+                                    {% endif %}
+
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>
+                                {{ program.discipline.competention }}
+                            </td>
+                            <td >
+                                <textarea required title="Содержание компетенций согласно ФГОС ВО" id="cont" style="width: 100%"></textarea>
+                            </td>
+                            <td>
+                                <textarea required title="Перечень планируемых результатов обучения по дисциплине" id="listof" style="width: 100%"></textarea>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </table>
+                        <br/>
+                        <table border="1" width="90%" id="tablewithhours" >
+                        <caption style="text-align: center;color: black">Содержание дисциплины, структурированное по разделам, с указанием отведенного на них количества академических часов и видов учебных занятий</caption>
+
+                            <tbody id="tbodyofhours">
+                                <tr>
+                                    <th rowspan="4" >
+                                        Раздел дисциплины
+                                    </th>
+                                    <th rowspan="4" >
+                                        Семестр
+                                    </th>
+                                    <th rowspan="4" >
+                                        Всего по разделу
+                                    </th>
+                                    <th colspan="5" >
+                                        Объем часов (по видам работы)
+                                    </th>
+                                </tr>
+                            <tr>
+                                <th colspan="4">
+                                    Контактная работа
+                                </th>
+                                <th rowspan="3">
+                                        Самостоятельная работа обучающихся
+                                    </th>
+
+                            </tr>
+                            <tr>
+                                <th rowspan="2">
+                                    Всего
+                                </th>
+                                <th colspan="3">
+                                    в том числе
+                                </th>
+                            </tr>
+                            <tr>
+                                <th>
+                                    Занятия лекционного типа
+                                </th>
+                                <th>
+                                    Практические и семинарские занятия
+                                </th>
+                                <th>
+                                    Лабораторные занятия
+                                </th>
+                            </tr>
+                            <tr id="1" onchange="calculate(id);getPartOfDisc();" >
+                                <td style="width: 44%"><input required type="text" title="partofdiscipline" id="partofdiscipline1" style="width: 100%"> </td>
+                                <td style="width: 8%"><input required type="text" title="semester" id="semester1" style="width: 100%"> </td>
+                                <td style="width: 8%"><input required type="text" title="allinpart" id="allinpart1" style="width: 100%" > </td>
+                                <td style="width: 8%"><input required type="text" title="all" id="all1" style="width: 100%" > </td>
+                                <td style="width: 8%"><input required type="text" title="lectures" id="lectures1" style="width: 100%" > </td>
+                                <td style="width: 8%"><input required type="text" title="pracs" id="pracs1" style="width: 100%" > </td>
+                                <td style="width: 8%"><input required type="text" title="labs" id="labs1" style="width: 100%" > </td>
+                                <td style="width: 8%"><input required type="text" title="self" id="self1" style="width: 100%" > </td>
+                            </tr>
+                            </tbody>
+                        <tr id="intotal">
+                            <td style="width: 44%; " align="right"><b>ИТОГО:</b></td>
+                            <td style="width: 8%" id="semester"></td>
+                                <td style="width: 8%" id="allinpart"></td>
+                                <td style="width: 8%" id="all"></td>
+                                <td style="width: 8%" id="lectures"></td>
+                                <td style="width: 8%" id="pracs"></td>
+                                <td style="width: 8%" id="labs"></td>
+                                <td style="width: 8%" id="self"></td>
+                        </tr>
+                        </table>
+                        <input type="button" title="addtrs" value="Добавить строчку"  onclick="addTr('1', 'tbodyofhours', ['partofdiscipline', 'semester', 'allinpart', 'all', 'lectures', 'pracs', 'labs', 'self'] )">
+                    {% else  %}
+                        {% if obj.html_name == 'intensity' %}
+                        <td align="left" >
+                        <table align="center"> <tbody>
+                        <tr >  {{ obj }} зачетных единиц; <input type="text" style="width: 5%" title="hoursfromtable" id="hoursfromtable" value="0"> час(-а, -ов).</tr></tbody>
+                        </table>
+                         {% else  %}
+                            {% if obj.html_name == 'attestation' %}
+                        <td align="left"  >
+                        <table align="center"> <tbody>
+                        <tr >  {{ obj }} </tr></tbody>
+                        </table>
+                         {% else  %}
+                                {% if obj.html_name == 'method' %}
+                                    <td align="center">
+                                    {{ obj }}
+                                    <table border="1" width="90%" id="methodTable" >
+                        <caption style="text-align: center;color: black">Методическое обеспечение самостоятельной работы обучающихся</caption>
+
+                            <tbody id="tbodymethodTable">
+                                <tr>
+                                    <th >
+                                        Тема, раздел
+                                    </th>
+                                    <th >
+                                        Задания для самостоятельной работы
+                                    </th>
+                                    <th >
+                                        Список литературы (с указанием разделов, глав/страниц)
+                                    </th>
+                                    <th >
+                                        Форма контроля
+                                    </th>
+                                </tr>
+
+                            <tr id="100" >
+                                <td style="width: 25%"><input required type="text" title="theme" id="theme100" style="width: 100%"> </td>
+                                <td style="width: 25%"><input required type="text" title="task" id="task100" style="width: 100%"> </td>
+                                <td style="width: 25%"><input required type="text" title="literature" id="literature100" style="width: 100%" > </td>
+                                <td style="width: 25%"><input required type="text" title="cntrlform" id="cntrlform100" style="width: 100%" > </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <input type="button" title="addtrs" value="Добавить строку"  onclick="addTr('100', 'tbodymethodTable', ['theme','task', 'literature', 'cntrlform'])">
+                                    {% else %}
+                                    {% if obj.html_name == 'listit' %}
+                                        <td align="center">
+                                    {{ obj }}
+                                    <table border="1" width="90%" id="listit" >
+                        <caption style="text-align: center;color: black">Материально-техническая база для проведения всех видов дисциплинарной и междисциплинарной подготовки</caption>
+
+                            <tbody id="tbodyBase">
+                                <tr>
+                                    <th >
+                                        Наименование специальных помещений и помещений для самостоятельной работы
+                                    </th>
+                                    <th >
+                                        Оснащенность специальных помещений и помещений для самостоятельной работы обучающихся
+                                    </th>
+                                    <th >
+                                        Перечень лицензионного программного обеспечения. Реквизиты подтверждающего документа
+                                    </th>
+                                </tr>
+
+                            <tr id="200">
+                                <td style="width: 25%"><input type="text" title="locationsname" id="locationsname200" style="width: 100%"> </td>
+                                <td style="width: 25%"><input type="text" title="equipment" id="equipment200" style="width: 100%"> </td>
+                                <td style="width: 25%"><input type="text" title="license" id="license200" style="width: 100%" > </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <input type="button" title="addtrs" value="Добавить строку"  onclick="addTr('200', 'tbodyBase', ['locationsname','equipment', 'license'])">
+                                        {% else %}
+                            <td align="center">
+                        {{ obj }}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                           {% endif %}
+                    {% endif %}
+
+                </td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+            </table>
+    <br/>
+    <div class="footer" style="text-align: center">
+            <button type="button" class="save btn btn-default" onclick="sendEverything()">Сохранить</button>
+</div>
+    <br/>
+    </div>
+</form>
+{% endblock %}
